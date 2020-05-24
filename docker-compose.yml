@@ -1,0 +1,33 @@
+version: "3.7"
+services:
+  cotacao-db:
+    container_name: cotacao-db
+    image: postgres:9.6-alpine
+    restart: always
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "25432:5432"
+    environment:
+      POSTGRES_DB: cotacao
+      POSTGRES_USER: cotacao
+      POSTGRES_PASSWORD: password
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    links:
+      - cotacao-db
+    depends_on:
+      - cotacao-db
+  cotacao-app:
+    build:
+      context: ../../..
+      dockerfile: ./src/main/docker/Dockerfile.jvm
+    ports:
+      - "8081:8081"
+    links:
+      - cotacao-db
+    depends_on:
+      - cotacao-db
